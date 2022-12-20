@@ -12,16 +12,16 @@ import (
 func (k Keeper) AppendPost(ctx sdk.Context, post types.Post) uint64 {
 	count := k.GetPostCount(ctx)
 	post.Id = count
-	
+
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.PostKey))
 
 	byteKey := make([]byte, 8)
 	binary.BigEndian.PutUint64(byteKey, post.Id)
-	
+
 	appendedValue := k.cdc.MustMarshal(&post)
 	store.Set(byteKey, appendedValue)
 
-	k.SetPostCount(ctx, count + 1)
+	k.SetPostCount(ctx, count+1)
 	return count
 }
 
