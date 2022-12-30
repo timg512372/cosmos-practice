@@ -46,3 +46,18 @@ func (k Keeper) SetPostCount(ctx sdk.Context, count uint64) {
 
 	store.Set(byteKey, bz)
 }
+
+func (k Keeper) GetPost(ctx sdk.Context, id uint64) (val types.Post, found bool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.PostKey))
+
+	byteKey := []byte(types.PostKey)
+	binary.BigEndian.PutUint64(byteKey, id)
+
+	post := store.Get(byteKey)
+	if post == nil {
+		return val, false
+	}
+
+	k.cdc.MustUnmarshal(post, &val)
+	return val, true
+}
