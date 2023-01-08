@@ -1,9 +1,11 @@
 import { Client, registry, MissingWalletError } from 'scavenge-client-ts'
 
+import { Commit } from "scavenge-client-ts/scavenge.scavenge/types"
 import { Params } from "scavenge-client-ts/scavenge.scavenge/types"
+import { Scavenge } from "scavenge-client-ts/scavenge.scavenge/types"
 
 
-export { Params };
+export { Commit, Params, Scavenge };
 
 function initClient(vuexGetters) {
 	return new Client(vuexGetters['common/env/getEnv'], vuexGetters['common/wallet/signer'])
@@ -35,9 +37,15 @@ function getStructure(template) {
 const getDefaultState = () => {
 	return {
 				Params: {},
+				Scavenge: {},
+				ScavengeAll: {},
+				Commit: {},
+				CommitAll: {},
 				
 				_Structure: {
+						Commit: getStructure(Commit.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
+						Scavenge: getStructure(Scavenge.fromPartial({})),
 						
 		},
 		_Registry: registry,
@@ -71,6 +79,30 @@ export default {
 						(<any> params).query=null
 					}
 			return state.Params[JSON.stringify(params)] ?? {}
+		},
+				getScavenge: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.Scavenge[JSON.stringify(params)] ?? {}
+		},
+				getScavengeAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.ScavengeAll[JSON.stringify(params)] ?? {}
+		},
+				getCommit: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.Commit[JSON.stringify(params)] ?? {}
+		},
+				getCommitAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.CommitAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -123,6 +155,102 @@ export default {
 				return getters['getParams']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryParams API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryScavenge({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.ScavengeScavenge.query.queryScavenge( key.index)).data
+				
+					
+				commit('QUERY', { query: 'Scavenge', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryScavenge', payload: { options: { all }, params: {...key},query }})
+				return getters['getScavenge']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryScavenge API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryScavengeAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.ScavengeScavenge.query.queryScavengeAll(query ?? undefined)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await client.ScavengeScavenge.query.queryScavengeAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'ScavengeAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryScavengeAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getScavengeAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryScavengeAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryCommit({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.ScavengeScavenge.query.queryCommit( key.index)).data
+				
+					
+				commit('QUERY', { query: 'Commit', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryCommit', payload: { options: { all }, params: {...key},query }})
+				return getters['getCommit']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryCommit API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryCommitAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.ScavengeScavenge.query.queryCommitAll(query ?? undefined)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await client.ScavengeScavenge.query.queryCommitAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'CommitAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryCommitAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getCommitAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryCommitAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
